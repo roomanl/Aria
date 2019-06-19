@@ -437,6 +437,13 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     ALog.i(TAG, String.format("任务【%s】完成", getFileName()));
     sendState(IThreadState.STATE_COMPLETE, null);
   }
+  protected synchronized void sendFileSizeMsg(int fileSize) {
+    ALog.i(TAG, String.format("【%s】文件大小：", getFileName())+fileSize);
+    Bundle b = new Bundle();
+    b.putSerializable(IThreadState.KEY_ITEM_FILE_SIZE, fileSize);
+    sendState(IThreadState.STATE_ITEM_FILE_SIZE, b);
+  }
+
 
   /**
    * 发送失败信息

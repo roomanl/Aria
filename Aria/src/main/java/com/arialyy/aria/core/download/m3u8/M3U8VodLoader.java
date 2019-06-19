@@ -52,6 +52,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
   private VodStateManager mManager;
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition mCondition = LOCK.newCondition();
+  private long prvTime=0;
+  private long prvLength=0;
 
   M3U8VodLoader(IEventListener listener, DTaskWrapper wrapper) {
     super(listener, wrapper);
@@ -249,7 +251,29 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           }
           break;
         case STATE_RUNNING:
+          if(prvTime==0){
+            prvTime=System.currentTimeMillis();
+            prvLength=mProgress;
+          }else if(System.currentTimeMillis()-prvTime>=1000){
+            mEntity.setSpeed2(mProgress-prvLength);
+            mEntity.update();
+            prvTime=0;
+          }
           mProgress += (long) msg.obj;
+
+          break;
+        case STATE_ITEM_FILE_SIZE:
+          Bundle b = msg.getData();
+          int itemFileSize=b.getInt(IThreadState.KEY_ITEM_FILE_SIZE,0);
+          if(mEntity.getTsCount()>0){
+            int unDownSize=(mEntity.getTsCount()-mEntity.getDownTsCount())*itemFileSize;
+            mEntity.setDownSize(mEntity.getDownSize()+itemFileSize);
+            mEntity.setFileSize(unDownSize+mEntity.getDownSize());
+            if(mEntity.getDownTsCount()==3){
+              mEntity.setTsItemFileSize(itemFileSize);
+            }
+            mEntity.update();
+          }
           break;
       }
       return false;
@@ -264,6 +288,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       mTaskWrapper.asM3U8().setCompleteNum(completeNum);
       int percent = completeNum * 100 / mTaskRecord.threadRecords.size();
       mEntity.setPercent(percent);
+      mEntity.setTsCount(mTaskRecord.threadRecords.size());
+      mEntity.setDownTsCount(completeNum);
       mEntity.update();
     }
 

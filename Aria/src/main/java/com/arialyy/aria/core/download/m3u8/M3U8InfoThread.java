@@ -63,6 +63,7 @@ final class M3U8InfoThread implements Runnable {
    * 是否停止获取切片信息，{@code true}停止获取切片信息
    */
   private boolean isStop = false;
+  private String m3u8BaseUrl=null;
 
   interface OnGetLivePeerCallback {
     void onGetPeer(String url);
@@ -90,6 +91,7 @@ final class M3U8InfoThread implements Runnable {
       handleConnect(conn);
     } catch (IOException e) {
       e.printStackTrace();
+      failDownload("Url无效："+e.getMessage(), false);
     } finally {
       if (conn != null) {
         conn.disconnect();
@@ -123,15 +125,24 @@ final class M3U8InfoThread implements Runnable {
               onGetPeerCallback.onGetPeer(info);
             }
           } else {
+            if(info.indexOf("http")<0){
+              if(m3u8BaseUrl==null){
+                m3u8BaseUrl = mEntity.getUrl().substring(0, mEntity.getUrl().lastIndexOf("/")+1 );
+              }
+              info=m3u8BaseUrl+info;
+            }
             extInf.add(info);
           }
         } else if (line.startsWith("#EXT-X-STREAM-INF")) {
           int setBand = mTaskWrapper.asM3U8().getBandWidth();
           int bandWidth = getBandWidth(line);
-          if (setBand == 0) {
-            handleBandWidth(conn, reader.readLine());
-          } else if (bandWidth == setBand) {
-            handleBandWidth(conn, reader.readLine());
+          if (setBand == 0 || bandWidth == setBand) {
+            String m3u8Url=getM3u8Url(mEntity.getUrl(),reader.readLine(),true);
+            if(m3u8Url==null){
+              failDownload("Url无效", false);
+              return;
+            }
+            handleBandWidth(conn, m3u8Url);
           } else {
             failDownload(String.format("【%s】码率不存在", bandWidth), false);
           }
@@ -159,6 +170,45 @@ final class M3U8InfoThread implements Runnable {
     } else {
       failDownload(String.format("不支持的响应，code: %s", code), true);
     }
+  }
+
+  public String getM3u8Url(String parentUrl,String subUrl,boolean last){
+    if(subUrl.indexOf("http")>-1) {
+      return subUrl;
+    }
+      String basepath="";
+      if(parentUrl.indexOf(".com")>-1){
+        basepath=parentUrl.substring(0, parentUrl.lastIndexOf(".com") + 4);
+      }else if(parentUrl.indexOf(".cn")>-1){
+        basepath=parentUrl.substring(0, parentUrl.lastIndexOf(".cn") + 3);
+      }else if(parentUrl.indexOf(".vip")>-1){
+        basepath=parentUrl.substring(0, parentUrl.lastIndexOf(".vip") + 4);
+      }else if(parentUrl.indexOf(".net")>-1){
+        basepath=parentUrl.substring(0, parentUrl.lastIndexOf(".net") + 4);
+      }else if(parentUrl.indexOf(".org")>-1){
+        basepath=parentUrl.substring(0, parentUrl.lastIndexOf(".org") + 4);
+      }
+      if(!last){
+         basepath = parentUrl.substring(0, parentUrl.lastIndexOf("/")+1 );
+      }
+      String connUrl=basepath+subUrl;
+      if(subUrl.startsWith("/") || basepath.endsWith("/")){
+        connUrl=basepath+subUrl;
+      }else if(!subUrl.startsWith("/") && !basepath.endsWith("/")){
+        connUrl=basepath+"/"+subUrl;
+      }
+      try {
+        HttpURLConnection conn = (HttpURLConnection) new URL(connUrl).openConnection();
+        if (conn.getResponseCode() == 200) {
+          m3u8BaseUrl=basepath;
+          return connUrl;
+        }else {
+          return getM3u8Url(parentUrl,subUrl,false);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+        return null;//getM3u8Url(parentUrl,subUrl,false);
+      }
   }
 
   /**

@@ -75,6 +75,7 @@ final class M3U8ThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         conn.setChunkedStreamingMode(0);
       }
       conn.connect();
+      handleFileSize(conn.getContentLength());
       //Map<String, List<String>> header = conn.getHeaderFields();
       //int code = conn.getResponseCode();
       //String msg = conn.getResponseMessage();
@@ -214,6 +215,9 @@ final class M3U8ThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         e.printStackTrace();
       }
     }
+  }
+  private void handleFileSize(int fileSize){
+    sendFileSizeMsg(fileSize);
   }
 
   /**

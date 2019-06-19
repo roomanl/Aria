@@ -27,9 +27,10 @@ public interface IThreadState extends Handler.Callback {
   int STATE_COMPLETE = 0x04;
   int STATE_RUNNING = 0x05;
   int STATE_UPDATE_PROGRESS = 0x06;
+  int STATE_ITEM_FILE_SIZE = 0x09;
   String KEY_RETRY = "KEY_RETRY";
   String KEY_ERROR_INFO = "KEY_ERROR_INFO";
-
+  String KEY_ITEM_FILE_SIZE = "KEY_ITEM_FILE_SIZE";
   /**
    * 任务是否已经停止
    *

@@ -70,6 +70,8 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
 
   private boolean isComplete = false;
 
+  private long speed2=0;
+
   /**
    * 上一次停止时间
    */
@@ -105,6 +107,14 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
 
   public void setSpeed(long speed) {
     this.speed = speed;
+  }
+
+  public long getSpeed2() {
+    return speed2;
+  }
+
+  public void setSpeed2(long speed2) {
+    this.speed2 = speed2;
   }
 
   public String getConvertSpeed() {

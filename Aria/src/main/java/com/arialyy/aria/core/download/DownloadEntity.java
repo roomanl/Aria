@@ -52,6 +52,11 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
    */
   private String serverFileName;
 
+  private int tsCount=0;
+  private int downTsCount=0;
+  private int tsItemFileSize=0;
+  private int downSize=0;
+
   @Override public String getKey() {
     return getUrl();
   }
@@ -60,8 +65,41 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
     return getUrl().startsWith("ftp") ? AbsTaskWrapper.D_FTP : AbsTaskWrapper.D_HTTP;
   }
 
+  public int getTsCount() {
+    return tsCount;
+  }
+
+  public int getDownSize() {
+    return downSize;
+  }
+
+  public void setDownSize(int downSize) {
+    this.downSize = downSize;
+  }
+
+  public void setTsCount(int tsCount) {
+    this.tsCount = tsCount;
+  }
+
+  public int getDownTsCount() {
+    return downTsCount;
+  }
+
+  public void setDownTsCount(int downTsCount) {
+    this.downTsCount = downTsCount;
+  }
+
+  public long getTsItemFileSize() {
+    return tsItemFileSize;
+  }
+
+  public void setTsItemFileSize(int tsItemFileSize) {
+    this.tsItemFileSize = tsItemFileSize;
+  }
+
   public DownloadEntity() {
   }
+
 
   public String getMd5Code() {
     return md5Code;

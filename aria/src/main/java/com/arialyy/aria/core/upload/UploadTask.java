@@ -26,7 +26,7 @@ import com.arialyy.aria.core.upload.uploader.SimpleUploadUtil;
 /**
  * Created by lyy on 2017/2/23. 上传任务
  */
-public class UploadTask extends AbsNormalTask<UploadEntity, UTaskWrapper> {
+public class UploadTask extends AbsNormalTask<UTaskWrapper> {
 
   private UploadTask(UTaskWrapper taskWrapper, Handler outHandler) {
     mTaskWrapper = taskWrapper;
