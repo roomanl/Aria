@@ -1,6 +1,46 @@
+
 # Aria
 ![图标](https://github.com/AriaLyy/DownloadUtil/blob/v_3.0/app/src/main/res/mipmap-hdpi/ic_launcher.png)</br>
 ## [ENGLISH DOC](https://github.com/AriaLyy/Aria/blob/master/ENGLISH_README.md)</br>
+### 2019/06/19更新说明
+#### 1、优化m3u8下载
+比如一个M3U8的url是：http://xxxx.com/2019/07/06/index.m3u8<br/>
+文件内容如下：
+```
+#EXTM3U
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1500000,RESOLUTION=1920x1080
+1500kb/hls/index.m3u8
+```
+我们需要在上面内容中的1500kb/hls/index.m3u8文件中来获取ts列表。所以就需要1500kb/hls/index.m3u8和域名拼接。在实际项目中发现拼接域名的方式有时候是http://xxxx.com/1500kb/hls/index.m3u8这样的。有时候又是http://xxxx.com/2019/07/06/1500kb/hls/index.m3u8这样的。此次更新会从这两种方式中自动获取正确的拼接方式。
+#### 2、优化M3U8下载速度
+在下载M3U8时发现获取下载速度task.getmEntity().getSpeed()一直是0。于是添加了一个新的下载速度属性。task.getmEntity().getSpeed2()即可获取。
+计算方式为:
+```
+mProgress-上一秒的mProgress
+```
+### 3、新增M3U8视频文件大小。
+DownloadEntity实体类新增了4个属性：
+```
+private int tsCount=0;//ts文件总数
+  private int downTsCount=0;//已下载的ts数量
+  private int tsItemFileSize=0;//第三个TS文件的大小
+  private int downSize=0;//已下载的大小。原来的CurrentProgress在暂停又重新下载后就会恢复为0.所以加了这个字段。
+```
+task.getmEntity().getFileSize()获取视频大小<br/>
+因为M3U8文件的特殊性。在下载过程中很难获取到M3U8视频的实际大小。获取到的视频文件大小也只是一个大概值。<br/>
+视频文件大小的计算方式为：
+```
+downSize+最新一个ts文件的大小*(tsCount-downTsCount)
+```
+因此task.getmEntity().getFileSize()获取到的值会一直在变化。但是变化的大小都是在视频实际大小左右变化<br/>
+如果你需要一个不会一直变化的大小可以用
+```
+tsItemFileSize*tsCount
+```
+的方式来获取。这样也是一个大概值。用第三个TS的大小乘以TS总数。
+
+
+
 ## [中文文档](https://aria.laoyuyu.me/aria_doc)
 Aria项目源于工作中遇到的一个文件下载管理的需求，当时被下载折磨的痛不欲生，从那时起便萌生了编写一个简单易用，稳当高效的下载框架，aria经历了1.0到3.0的开发，算是越来越接近当初所制定的目标了。
 
