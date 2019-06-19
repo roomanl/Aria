@@ -11,7 +11,7 @@
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1500000,RESOLUTION=1920x1080
 1500kb/hls/index.m3u8
 ```
-我们需要在上面内容中的1500kb/hls/index.m3u8文件中来获取ts列表。所以就需要1500kb/hls/index.m3u8和域名拼接。在实际项目中发现拼接域名的方式有时候是http://xxxx.com/1500kb/hls/index.m3u8这样的。有时候又是http://xxxx.com/2019/07/06/1500kb/hls/index.m3u8这样的。此次更新会从这两种方式中自动获取正确的拼接方式。
+我们需要在上面内容中的1500kb/hls/index.m3u8文件中来获取ts列表。所以就需要1500kb/hls/index.m3u8和域名拼接。在实际项目中发现拼接域名的方式有时候是 http://xxxx.com/1500kb/hls/index.m3u8 这样的。有时候又是 http://xxxx.com/2019/07/06/1500kb/hls/index.m3u8 这样的。此次更新会从这两种方式中自动获取正确的拼接方式。
 #### 2、优化M3U8下载速度
 在下载M3U8时发现获取下载速度task.getmEntity().getSpeed()一直是0。于是添加了一个新的下载速度属性。task.getmEntity().getSpeed2()即可获取。
 计算方式为:
